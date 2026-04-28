@@ -1,0 +1,242 @@
+///LOGIN APP USING CORDOVA 
+
+//index.html 
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login App</title>
+</head>
+
+<body style="text-align:center; font-family:Arial;">
+
+    <!-- Header Image -->
+    <img src="https://cdn-icons-png.flaticon.com/512/5087/5087579.png" width="120"><br><br>
+
+    <!-- Title -->
+    <h2>User Login</h2>
+
+    <!-- Form -->
+    <form>
+        Username:<br>
+        <input type="text" id="u"><br><br>
+
+        Password:<br>
+        <input type="password" id="p"><br><br>
+
+        <input type="button" value="Submit" onclick="check()">
+        <input type="reset" value="Reset">
+    </form>
+
+    <!-- Message -->
+    <p id="msg"></p>
+
+    <!-- JavaScript -->
+    <script>
+        function check() {
+
+            var username = document.getElementById("u").value;
+            var password = document.getElementById("p").value;
+
+            // Simple login check
+            if (username == "admin" && password == "123") {
+                document.getElementById("msg").innerHTML = "Login Successful";
+            } else {
+                document.getElementById("msg").innerHTML = "Invalid Login";
+            }
+        }
+    </script>
+
+</body>
+</html>
+
+//MainActivity.java 
+
+package com.example.ex4;
+
+import android.os.Bundle;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+@Override
+protected void onCreate(Bundle b) {
+super.onCreate(b);
+
+WebView web = new WebView(this);
+setContentView(web);
+
+// Enable JavaScript
+web.getSettings().setJavaScriptEnabled(true);
+
+// Open inside app (not browser)
+web.setWebViewClient(new WebViewClient());
+
+// Load HTML file
+web.loadUrl("file:///android_asset/index.html");
+}
+} 
+
+
+///LOCATION APP 
+
+//index.html (main file)
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Location App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        body { text-align: center; font-family: Arial; }
+        button { padding: 10px; margin: 10px; }
+    </style>
+</head>
+
+<body>
+
+<h2>My Location App</h2>
+
+<button onclick="getLocation()">Get Location</button>
+
+<p id="loc"></p>
+<p id="result"></p>
+
+<script>
+
+// Step 1: Get location
+function getLocation() {
+    navigator.geolocation.getCurrentPosition(showPosition);
+}
+
+// Step 2: Show location
+function showPosition(position) {
+
+    let lat = position.coords.latitude;
+    let lon = position.coords.longitude;
+
+    document.getElementById("loc").innerHTML =
+        "Lat: " + lat + "<br>Lon: " + lon;
+
+    findPlaces(lat, lon);
+}
+
+// Step 3: Find nearby places
+function findPlaces(lat, lon) {
+
+    let query = `
+    [out:json];
+    (
+      node["amenity"="hospital"](around:1000, ${lat}, ${lon});
+      node["amenity"="atm"](around:1000, ${lat}, ${lon});
+      node["amenity"="restaurant"](around:1000, ${lat}, ${lon});
+    );
+    out;
+    `;
+
+    let url = "https://overpass-api.de/api/interpreter?data=" + encodeURIComponent(query);
+
+    fetch(url)
+    .then(res => res.json())
+    .then(data => {
+
+        let output = "";
+
+        data.elements.forEach(p => {
+            output += (p.tags.name || "No Name") + " (" + p.tags.amenity + ")<br>";
+        });
+
+        document.getElementById("result").innerHTML = output;
+    });
+}
+
+</script>
+
+</body>
+</html>
+
+
+[
+    RUN COMMANDS
+cordova create LocationApp
+cd LocationApp
+cordova platform add android
+  -> Replace www/index.html with your code
+cordova run android
+
+]
+
+
+///SIMPLE NOTES / RECIPE APP(ionic)
+
+[
+    SETUP 
+npm install -g @ionic/cli
+ionic start App blank
+cd App
+ionic serve
+
+]
+
+//home.page.html
+<ion-header>
+ <ion-toolbar>
+   <ion-title>Notes App</ion-title>
+ </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+ <ion-input [(ngModel)]="title" placeholder="Title"></ion-input>
+
+ <ion-textarea [(ngModel)]="desc" placeholder="Description"></ion-textarea>
+
+ <ion-button (click)="add()">Add</ion-button>
+
+ <ion-item *ngFor="let i of list; let x = index">
+   {{ i.title }} - {{ i.desc }}
+   <ion-button (click)="del(x)">Delete</ion-button>
+ </ion-item>
+
+</ion-content>
+
+//home.page.ts
+
+import { Component } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+
+@Component({
+  selector: 'app-home',
+  templateUrl: 'home.page.html',
+  standalone: true,
+  imports: [IonicModule, FormsModule, CommonModule]
+})
+export class HomePage {
+
+  title = '';
+  desc = '';
+  list: any[] = [];
+
+  add() {
+    if (this.title && this.desc) {
+      this.list.push({
+        title: this.title,
+        desc: this.desc
+      });
+
+      // clear input
+      this.title = '';
+      this.desc = '';
+    }
+  }
+
+  del(i: number) {
+    this.list.splice(i, 1);
+  }
+}
+

@@ -1,0 +1,467 @@
+///BUTTON CLICK :
+
+//activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+   xmlns:android="http://schemas.android.com/apk/res/android"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   android:gravity="center"
+   android:orientation="vertical">
+
+   <Button
+       android:id="@+id/btnClick"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="Click Me"
+       android:onClick="showMessage"/>  <!-- CONNECTS TO JAVA -->
+
+</LinearLayout>
+
+//MainActivity.java
+package com.example.ex1a;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
+       super.onCreate(savedInstanceState);
+       setContentView(R.layout.activity_main);
+   }
+
+   // This method is called when button is clicked
+   public void showMessage(View v) {
+       Toast.makeText(this, "Button Clicked!", Toast.LENGTH_SHORT).show();
+   }
+}
+
+
+///CALCULATOR:
+
+//activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+   xmlns:android="http://schemas.android.com/apk/res/android"
+   android:orientation="vertical"
+   android:padding="10dp"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent">
+
+   <!-- Display Screen -->
+   <TextView
+       android:id="@+id/t"
+       android:text="0"
+       android:textSize="30sp"
+       android:padding="20dp"/>
+
+   <!-- Buttons Layout -->
+   <GridLayout
+       android:columnCount="4">
+
+       <!-- Row 1 -->
+       <Button android:text="7" android:onClick="press"/>
+       <Button android:text="8" android:onClick="press"/>
+       <Button android:text="9" android:onClick="press"/>
+       <Button android:text="/" android:onClick="press"/>
+
+       <!-- Row 2 -->
+       <Button android:text="4" android:onClick="press"/>
+       <Button android:text="5" android:onClick="press"/>
+       <Button android:text="6" android:onClick="press"/>
+       <Button android:text="*" android:onClick="press"/>
+
+       <!-- Row 3 -->
+       <Button android:text="1" android:onClick="press"/>
+       <Button android:text="2" android:onClick="press"/>
+       <Button android:text="3" android:onClick="press"/>
+       <Button android:text="-" android:onClick="press"/>
+
+       <!-- Row 4 -->
+       <Button android:text="0" android:onClick="press"/>
+       <Button android:text="C" android:onClick="press"/>
+       <Button android:text="=" android:onClick="press"/>
+       <Button android:text="+" android:onClick="press"/>
+
+   </GridLayout>
+
+</LinearLayout>
+
+//MainActivity.java
+package com.example.calculator;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+   TextView t;
+
+   double firstNumber = 0;
+   String operator = "";
+
+   @Override
+   protected void onCreate(Bundle b) {
+       super.onCreate(b);
+       setContentView(R.layout.activity_main);
+
+       t = findViewById(R.id.t);
+   }
+
+   // This method is called when ANY button is clicked
+   public void press(View v) {
+
+       Button btn = (Button) v;
+       String value = btn.getText().toString();
+       String current = t.getText().toString();
+
+       // 1. If number is pressed
+       if (value.matches("[0-9]")) {
+           if (current.equals("0")) {
+               t.setText(value);
+           } else {
+               t.setText(current + value);
+           }
+       }
+
+       // 2. If operator is pressed
+       else if (value.equals("+") || value.equals("-") ||
+                value.equals("*") || value.equals("/")) {
+
+           firstNumber = Double.parseDouble(current);
+           operator = value;
+           t.setText("0");
+       }
+
+       // 3. If equal is pressed
+       else if (value.equals("=")) {
+
+           double secondNumber = Double.parseDouble(current);
+           double result = 0;
+
+           if (operator.equals("+")) result = firstNumber + secondNumber;
+           else if (operator.equals("-")) result = firstNumber - secondNumber;
+           else if (operator.equals("*")) result = firstNumber * secondNumber;
+           else if (operator.equals("/")) {
+               if (secondNumber != 0)
+                   result = firstNumber / secondNumber;
+               else
+                   result = 0;
+           }
+
+           t.setText("" + result);
+       }
+
+       // 4. If clear is pressed
+       else if (value.equals("C")) {
+           t.setText("0");
+           firstNumber = 0;
+           operator = "";
+       }
+   }
+}
+
+
+///storage app to demonstrate SQLite in Android Studio. DBHelper.java 
+
+
+//DBHelper.java 
+
+package com.example.ex2;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+public class DBHelper extends SQLiteOpenHelper {
+
+   public DBHelper(Context context) {
+       super(context, "StudentDB", null, 1);
+   }
+
+   @Override
+   public void onCreate(SQLiteDatabase db) {
+       // Create table
+       db.execSQL("CREATE TABLE students(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)");
+   }
+
+   @Override
+   public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+       db.execSQL("DROP TABLE IF EXISTS students");
+       onCreate(db);
+   }
+
+   // Insert data
+   public void insert(String name) {
+       SQLiteDatabase db = getWritableDatabase();
+       db.execSQL("INSERT INTO students(name) VALUES('" + name + "')");
+   }
+
+   // View data
+   public Cursor view() {
+       SQLiteDatabase db = getReadableDatabase();
+       return db.rawQuery("SELECT * FROM students", null);
+   }
+}
+
+//Xml file
+
+<LinearLayout
+   xmlns:android="http://schemas.android.com/apk/res/android"
+   android:orientation="vertical"
+   android:padding="20dp"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent">
+
+   <EditText
+       android:id="@+id/name"
+       android:hint="Enter Name"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"/>
+
+   <Button
+       android:text="Insert"
+       android:onClick="insertData"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"/>
+
+   <Button
+       android:text="View"
+       android:onClick="viewData"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"/>
+
+</LinearLayout>
+
+//MainActivity.java
+package com.example.ex2;
+
+import android.database.Cursor;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+   EditText name;
+   DBHelper db;
+
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
+       super.onCreate(savedInstanceState);
+       setContentView(R.layout.activity_main);
+
+       name = findViewById(R.id.name);
+       db = new DBHelper(this);
+   }
+
+   // Insert button click
+   public void insertData(View v) {
+
+       String n = name.getText().toString();
+
+       if (n.isEmpty()) {
+           Toast.makeText(this, "Enter name first", Toast.LENGTH_SHORT).show();
+           return;
+       }
+
+       db.insert(n);
+       Toast.makeText(this, "Inserted", Toast.LENGTH_SHORT).show();
+
+       name.setText(""); // clear box
+   }
+
+   // View button click
+   public void viewData(View v) {
+
+       Cursor c = db.view();
+
+       if (c.getCount() == 0) {
+           Toast.makeText(this, "No Data Found", Toast.LENGTH_SHORT).show();
+           return;
+       }
+
+       String data = "";
+
+       while (c.moveToNext()) {
+           data += c.getInt(0) + " - " + c.getString(1) + "\n";
+       }
+
+       Toast.makeText(this, data, Toast.LENGTH_LONG).show();
+   }
+}
+
+
+
+///LIBRARY:
+
+//DBHelper.java
+Only creates table (very simple)
+package com.example.library;
+
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+public class DBHelper extends SQLiteOpenHelper {
+
+   public DBHelper(Context context) {
+       super(context, "library.db", null, 1);
+   }
+
+   @Override
+   public void onCreate(SQLiteDatabase db) {
+
+       // Table: books
+       db.execSQL("CREATE TABLE books(name TEXT, status TEXT, student TEXT)");
+   }
+
+   @Override
+   public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+   }
+}
+
+
+//XML FILE
+
+<LinearLayout
+   xmlns:android="http://schemas.android.com/apk/res/android"
+   android:orientation="vertical"
+   android:padding="20dp"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent">
+
+   <EditText
+       android:id="@+id/book"
+       android:hint="Book Name"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"/>
+
+   <EditText
+       android:id="@+id/student"
+       android:hint="Student ID"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"/>
+
+   <Button
+       android:text="Add Book"
+       android:onClick="addBook"/>
+
+   <Button
+       android:text="Lend Book"
+       android:onClick="lendBook"/>
+
+   <Button
+       android:text="Reserve Book"
+       android:onClick="reserveBook"/>
+
+   <Button
+       android:text="View Books"
+       android:onClick="viewBooks"/>
+
+   <TextView
+       android:id="@+id/result"
+       android:text="Library Data"
+       android:textSize="18sp"
+       android:layout_marginTop="20dp"/>
+</LinearLayout>
+
+
+//JAVA FILE
+
+package com.example.library;
+
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.*;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+   EditText book, student;
+   TextView result;
+   DBHelper db;
+
+   @Override
+   protected void onCreate(Bundle b) {
+       super.onCreate(b);
+       setContentView(R.layout.activity_main);
+
+       book = findViewById(R.id.book);
+       student = findViewById(R.id.student);
+       result = findViewById(R.id.result);
+
+       db = new DBHelper(this);
+   }
+
+   // 1. ADD BOOK
+   public void addBook(View v) {
+
+       String b = book.getText().toString();
+
+       if (b.isEmpty()) {
+           Toast.makeText(this, "Enter book name", Toast.LENGTH_SHORT).show();
+           return;
+       }
+
+       SQLiteDatabase d = db.getWritableDatabase();
+       d.execSQL("INSERT INTO books VALUES('" + b + "','Available','-')");
+
+       Toast.makeText(this, "Book Added", Toast.LENGTH_SHORT).show();
+   }
+
+   // 2. LEND BOOK
+   public void lendBook(View v) {
+       update("Lent");
+   }
+
+   // 3. RESERVE BOOK
+   public void reserveBook(View v) {
+       update("Reserved");
+   }
+
+   // COMMON METHOD
+   void update(String status) {
+
+       String b = book.getText().toString();
+       String s = student.getText().toString();
+
+       SQLiteDatabase d = db.getWritableDatabase();
+
+       d.execSQL("UPDATE books SET status='" + status +
+               "', student='" + s + "' WHERE name='" + b + "'");
+
+       Toast.makeText(this, status, Toast.LENGTH_SHORT).show();
+   }
+
+   // 4. VIEW BOOKS
+   public void viewBooks(View v) {
+
+       SQLiteDatabase d = db.getReadableDatabase();
+       Cursor c = d.rawQuery("SELECT * FROM books", null);
+
+       String data = "";
+
+       while (c.moveToNext()) {
+           data += "Book: " + c.getString(0) +
+                   "\nStatus: " + c.getString(1) +
+                   "\nStudent: " + c.getString(2) + "\n\n";
+       }
+
+       result.setText(data);
+   }
+}
