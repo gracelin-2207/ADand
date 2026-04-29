@@ -1,0 +1,69 @@
+///SIMPLE NOTES / RECIPE APP(ionic)
+
+[
+    SETUP 
+npm install -g @ionic/cli
+ionic start App blank
+cd App
+ionic serve
+
+]
+
+//home.page.html
+<ion-header>
+ <ion-toolbar>
+   <ion-title>Notes App</ion-title>
+ </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+ <ion-input [(ngModel)]="title" placeholder="Title"></ion-input>
+
+ <ion-textarea [(ngModel)]="desc" placeholder="Description"></ion-textarea>
+
+ <ion-button (click)="add()">Add</ion-button>
+
+ <ion-item *ngFor="let i of list; let x = index">
+   {{ i.title }} - {{ i.desc }}
+   <ion-button (click)="del(x)">Delete</ion-button>
+ </ion-item>
+
+</ion-content>
+
+//home.page.ts
+
+import { Component } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+
+@Component({
+  selector: 'app-home',
+  templateUrl: 'home.page.html',
+  standalone: true,
+  imports: [IonicModule, FormsModule, CommonModule]
+})
+export class HomePage {
+
+  title = '';
+  desc = '';
+  list: any[] = [];
+
+  add() {
+    if (this.title && this.desc) {
+      this.list.push({
+        title: this.title,
+        desc: this.desc
+      });
+
+      // clear input
+      this.title = '';
+      this.desc = '';
+    }
+  }
+
+  del(i: number) {
+    this.list.splice(i, 1);
+  }
+}
