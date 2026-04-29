@@ -82,6 +82,9 @@ web.loadUrl("file:///android_asset/index.html");
 
 ///LOCATION APP 
 
+[INSTALL PLUGIN
+cordova plugin add cordova-plugin-geolocation]
+
 //index.html (main file)
 
 <!DOCTYPE html>
